@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>OpenAI Chat</title>
+    <meta name="viewport" content="width=device-width">
+    <style type="text/css">
+        body {
+            padding: 0 20px 10px 20px;
+        }
+        .header {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+        }
+        textarea, input[type="text"] {
+            display: block;
+            margin-bottom: 10px;
+            min-width: 640px;
+        }
+        button {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<form class="open-ai-chat" method="post">
+    <div class="header">
+        <h1>OpenAI Chat</h1>
+        <a href="https://platform.openai.com/playground" target="_blank">OpenAI Playground</a>
+    </div>
+    <label for="api-key-input">OpenAI API kľúč (<a href="https://platform.openai.com/account/api-keys" target="_blank">viď</a>):</label>
+    <input type="text" id="api-key-input" placeholder="Zadaj OpenAI kľúč..." />
+    <label for="user-input">Zadaj svoju otázku:</label>
+    <textarea id="user-input" placeholder="Zadaj svoju otázku, napr. &quot;Akej farby je nebo?&quot;"></textarea>
+    <button id="submit">Odoslať</button>
+    <label for="ai-response">Odpoveď AI:</label>
+    <textarea id="ai-response"></textarea>
+</form>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('.open-ai-chat');
+        form.onsubmit = async function(e) {
+            e.preventDefault(); // Prevent the form from submitting the traditional way
+
+            const apiKey = document.getElementById('api-key-input').value;
+            const userInput = document.getElementById('user-input').value;
+
+            if (!apiKey || !userInput.trim()) {
+                alert('API key and a question are required.');
+                return;
+            }
+
+            try {
+                const response = await fetch("https://api.openai.com/v1/completions", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + apiKey
+                    },
+                    body: JSON.stringify({
+                        model: "text-davinci-003",
+                        prompt: userInput,
+                        temperature: 0.7,
+                        max_tokens: 150,
+                        top_p: 1.0,
+                        frequency_penalty: 0.0,
+                        presence_penalty: 0.0
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const result = await response.json();
+                document.getElementById('ai-response').value = result.choices[0].text.trim();
+            }
+            catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please check the console for details.');
+            }
+        };
+    });
+</script>
+</body>
+</html>
