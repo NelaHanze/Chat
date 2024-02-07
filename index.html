@@ -61,7 +61,7 @@
                     },
                     body: JSON.stringify({
                         model: "text-davinci-003",
-                        prompt: userInput,
+                        prompt: "Answer the question based on the user input. If you don't know the answer, just say that you don't know, don't try to make up an answer. Use three sentences maximum and keep the answer as concise as possible.:\n```" + userInput + "```",
                         temperature: 0.7,
                         max_tokens: 150,
                         top_p: 1.0,
